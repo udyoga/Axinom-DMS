@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  dms-sender:
+    image: udyoga/dmssender
+    container_name: "dms-sender"
+    ports:     
+      - "8080:80" 
+    restart: on-failure
+
+  dms-recipient:
+    image: udyoga/dmsrecipient
+    container_name: "dms-recipient"
+    ports:     
+      - "8090:80" 
+    restart: on-failure
+   
+
+
+  
