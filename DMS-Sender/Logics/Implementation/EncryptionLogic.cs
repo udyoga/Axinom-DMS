@@ -20,7 +20,10 @@ namespace DMS_Sender.Logics.Implementation
         public string Encrypt(string clearText)
         {
             try
-            {                
+            {   
+                if(string.IsNullOrEmpty(clearText))
+                    return null;
+
                 byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
                 using (Aes encryptor = Aes.Create())
                 {

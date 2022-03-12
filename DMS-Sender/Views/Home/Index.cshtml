@@ -4,6 +4,14 @@
 
 @model AuthModel
 
+<script type="text/javascript">
+
+    function statusMessage(){
+        $('#dvStatus').hide();
+    }
+
+</script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="text-center">
@@ -23,7 +31,7 @@
            </div>
           <div class="form-outline mb-4">
             <input type="text" id="username" name="Username" class="form-control form-control-lg"
-              placeholder="User Name" />
+              placeholder="User Name" onfocus="javascript:statusMessage()" />
           </div>
 
           <!-- Password input -->
@@ -41,7 +49,7 @@
            <button type="submit" class="btn btn-primary btn-lg"
               style="padding-left: 9.5rem; padding-right: 7.5rem;">Upload</button>          
           </div>
-           <div class="text-center text-lg-start mt-4 pt-2">
+           <div id="dvStatus" class="text-center text-lg-start mt-4 pt-2">
                <table style="width:100%">
                    @if (ViewBag.States!=null)
                   {

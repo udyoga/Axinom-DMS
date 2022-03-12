@@ -1,7 +1,9 @@
 ﻿using DMS_recipient.Logics.Interface;
 using DMS_recipient.Models;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -46,6 +48,40 @@ namespace DMS_recipient.Logics.Implementation
 
                 throw;
             }            
+        }
+
+        public string DecryptJsonObject(string jsonString)
+        {
+            try
+            {
+                FolderStructure folderStructure = JsonConvert.DeserializeObject<FolderStructure>(jsonString);
+                folderStructure.name = Decrypt(folderStructure.name);
+                folderStructure.subFolder = DecryptSubfoldersNames(folderStructure.subFolder);
+
+                return JsonConvert.SerializeObject(folderStructure, Formatting.None,
+                                new JsonSerializerSettings
+                                {
+                                    NullValueHandling = NullValueHandling.Ignore
+                                });
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+           
+        }
+
+        private List<FolderStructure> DecryptSubfoldersNames(List<FolderStructure> subFolder)
+        {
+            if(subFolder==null)
+                return null;
+
+            foreach (var item in subFolder)
+            {
+                item.name = Decrypt(item.name);
+                item.subFolder = DecryptSubfoldersNames(item.subFolder);
+            }
+            return subFolder;
         }
     }
 }

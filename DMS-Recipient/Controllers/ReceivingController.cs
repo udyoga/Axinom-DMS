@@ -25,7 +25,7 @@ namespace DMS_recipient.Controllers
         {
             try
             {
-                string jsonValue = _encryptionLogic.Decrypt(postObject.jsoncipherText);
+                string jsonValue = _encryptionLogic.DecryptJsonObject(postObject.jsoncipherText);
 
                 if (!string.IsNullOrEmpty(jsonValue)) {
                     return Ok(await _databaseLogic.SaveFileContent(jsonValue));

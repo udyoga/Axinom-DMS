@@ -35,7 +35,7 @@ namespace DMS_Sender.Logics.Implementation
             Guid tempId = Guid.NewGuid();
             string fileName = Path.GetFileName(postedFile.FileName);
             string jsonStructure = null;
-            string encryptedJsonStructure = null;
+            //string encryptedJsonStructure = null;
             string folderPath = Path.Combine(path, tempId.ToString(), Path.GetFileNameWithoutExtension(fileName));
 
             #region -- Upload File
@@ -56,7 +56,7 @@ namespace DMS_Sender.Logics.Implementation
                 {
                     processStatus = new ProcessStatus()
                     {
-                        Action = "Read folder structure",
+                        Action = "Read folder structure & encrypt file names",
                         Status = true
                     };
                     jsonStructure = ReadTreeStructure(Path.GetFileNameWithoutExtension(fileName), folderPath);
@@ -71,28 +71,29 @@ namespace DMS_Sender.Logics.Implementation
             #endregion
 
             #region -- Encrypt json object
-            if (jsonStructure != null)
-            {
-                try
-                {
-                    processStatus = new ProcessStatus()
-                    {
-                        Action = "Encrypt json object",
-                        Status = true
-                    };
-                    encryptedJsonStructure = _encryptionLogic.Encrypt(jsonStructure);
-                }
-                catch (Exception ex)
-                {
-                    processStatus.Exception = ex;
-                    processStatus.Status = false;
-                }
-                processStatusList.Add(processStatus);
-            }
+            //---- Full object encryption method
+            //if (jsonStructure != null)
+            //{
+            //    try
+            //    {
+            //        processStatus = new ProcessStatus()
+            //        {
+            //            Action = "Encrypt json object",
+            //            Status = true
+            //        };
+            //        encryptedJsonStructure = _encryptionLogic.Encrypt(jsonStructure);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        processStatus.Exception = ex;
+            //        processStatus.Status = false;
+            //    }
+            //    processStatusList.Add(processStatus);
+            //}
             #endregion
 
             #region -- Send json file
-            if (encryptedJsonStructure != null)
+            if (jsonStructure != null)
             {
                 try
                 {
@@ -101,7 +102,7 @@ namespace DMS_Sender.Logics.Implementation
                         Action = "Send json file"
                     };
 
-                    HttpResponseMessage httpResponseMessage = await _recipientAPILogic.SendEncyptedFile(encryptedJsonStructure, authModel);
+                    HttpResponseMessage httpResponseMessage = await _recipientAPILogic.SendEncyptedFile(jsonStructure, authModel);
 
                     if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -189,7 +190,7 @@ namespace DMS_Sender.Logics.Implementation
                     subFolder = new List<FolderStructure>()
                 };
 
-                folderStructure.name = rootFolderName;
+                folderStructure.name = _encryptionLogic.Encrypt(rootFolderName);
                 folderStructure.type = "folder";
 
                 folderStructure.subFolder = DirectorySearch(new DirectoryInfo(folderPath), folderStructure.subFolder);
@@ -208,7 +209,7 @@ namespace DMS_Sender.Logics.Implementation
             }           
         }
 
-        private static List<FolderStructure> DirectorySearch(DirectoryInfo dir, List<FolderStructure> folderStructures)
+        private List<FolderStructure> DirectorySearch(DirectoryInfo dir, List<FolderStructure> folderStructures)
         {
             try
             {
@@ -216,7 +217,7 @@ namespace DMS_Sender.Logics.Implementation
                 {
                     folderStructures.Add(new FolderStructure()
                     {
-                        name = f.Name,
+                        name = _encryptionLogic.Encrypt(f.Name),
                         type = enFileStructureType.file.ToString(),
                     });
                 }
@@ -225,7 +226,7 @@ namespace DMS_Sender.Logics.Implementation
                 {
                     folderStructures.Add(new FolderStructure()
                     {
-                        name = d.Name,
+                        name = _encryptionLogic.Encrypt(d.Name),
                         type = enFileStructureType.folder.ToString(),
                         subFolder = DirectorySearch(d, new List<FolderStructure>())
                     });
